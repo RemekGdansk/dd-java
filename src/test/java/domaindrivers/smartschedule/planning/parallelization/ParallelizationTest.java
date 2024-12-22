@@ -39,7 +39,7 @@ class ParallelizationTest {
         ParallelStagesList sortedStages = stageParallelization.of(Set.of(stage1, stage2, stage3, stage4));
 
         //then
-        assertEquals(sortedStages.print(), "Stage1 | Stage2, Stage3 | Stage4");
+        assertEquals("Stage1 | Stage2, Stage3 | Stage4", sortedStages.print());
     }
 
     @Test

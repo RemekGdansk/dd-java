@@ -18,6 +18,20 @@ public record Stage(String stageName, Set<Stage> dependencies, Set<ResourceName>
         return this;
     }
 
+    boolean hasCircularDependency() {
+        return hasDependencyTo(this);
+    }
+
+    boolean hasDependencyTo(Stage toFind) {
+        if (this.dependencies().isEmpty()) {
+            return false;
+        } else if (this.dependencies().contains(toFind)) {
+            return true;
+        } else {
+            return this.dependencies().stream().anyMatch(dependency -> dependency.hasDependencyTo(toFind));
+        }
+    }
+
     public String name() {
         return stageName;
     }
@@ -33,6 +47,16 @@ public record Stage(String stageName, Set<Stage> dependencies, Set<ResourceName>
     @Override
     public int hashCode() {
         return Objects.hash(stageName);
+    }
+
+    @Override
+    public String toString() {
+        return "Stage{" +
+                "stageName='" + stageName + '\'' +
+                ", dependencies=" + dependencies.stream().map(Stage::stageName) +
+                ", resources=" + resources.stream().map(ResourceName::name) +
+                ", duration=" + duration +
+                '}';
     }
 }
 
