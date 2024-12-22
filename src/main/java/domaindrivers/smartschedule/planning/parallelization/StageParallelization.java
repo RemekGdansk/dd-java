@@ -2,6 +2,7 @@ package domaindrivers.smartschedule.planning.parallelization;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,11 +16,24 @@ public class StageParallelization {
         }
         final Set<Stage> remainingStages = new HashSet<>(stages);
         while (!remainingStages.isEmpty()) {
+            // Divide by logical dependencies
             final ParallelStagesList finalParallelStagesList = parallelStagesList;
             final Set<Stage> stagesForNextParallelStages = remainingStages.stream()
                     .filter(stage -> !hasUnfulfilledDependency(stage, finalParallelStagesList.allStages()))
                     .collect(Collectors.toSet());
-            parallelStagesList = parallelStagesList.add(new ParallelStages(stagesForNextParallelStages));
+            // Divide into financed and not financed
+            final List<Set<Stage>> financedAndNotFinanced =
+                    stagesForNextParallelStages.stream().collect(Collectors.teeing(
+                            Collectors.filtering(Stage::financed, Collectors.toSet()),
+                            Collectors.filtering(stage -> !stage.financed(), Collectors.toSet()),
+                            List::of
+                    ));
+            for (Set<Stage> stagesByFinancing : financedAndNotFinanced) {
+                if (!stagesByFinancing.isEmpty()) {
+                    parallelStagesList = parallelStagesList.add(new ParallelStages(stagesByFinancing));
+                }
+            }
+            // Remove already assigned stages from further analysis
             final Iterator<Stage> i = remainingStages.iterator();
             while (i.hasNext()) {
                 final Stage stage = i.next();

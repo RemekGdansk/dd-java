@@ -43,6 +43,24 @@ class ParallelizationTest {
     }
 
     @Test
+    void financedShouldBeBeforeNotFinanced() {
+        //given
+        Stage stage1 = new Stage("Stage1");
+        Stage stage2 = new Stage("Stage2", true);
+        Stage stage3 = new Stage("Stage3");
+        Stage stage4 = new Stage("Stage4", true);
+        stage2.dependsOn(stage1);
+        stage3.dependsOn(stage1);
+        stage4.dependsOn(stage1);
+
+        //when
+        ParallelStagesList sortedStages = stageParallelization.of(Set.of(stage1, stage2, stage3, stage4));
+
+        //then
+        assertEquals("Stage1 | Stage2, Stage4 | Stage3", sortedStages.print());
+    }
+
+    @Test
     void cantBeDoneWhenThereIsACycle() {
         //given
         Stage stage1 = new Stage("Stage1");
