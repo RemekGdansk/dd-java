@@ -22,6 +22,11 @@ public record Stage(String stageName, Set<Stage> dependencies, Set<ResourceName>
         return this;
     }
 
+    public Stage requiresResource(ResourceName resourceName) {
+        this.resources.add(resourceName);
+        return this;
+    }
+
     boolean hasCircularDependency() {
         return hasDependencyTo(this);
     }
