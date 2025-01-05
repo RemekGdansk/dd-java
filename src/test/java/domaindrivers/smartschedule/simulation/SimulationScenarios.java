@@ -10,7 +10,7 @@ import static domaindrivers.smartschedule.simulation.Demand.demandFor;
 import static java.math.BigDecimal.valueOf;
 import static org.junit.jupiter.api.Assertions.*;
 
-class SimulationScenarios {
+class SimulationScenariosTest {
 
     static final TimeSlot JAN_1 = TimeSlot.createDailyTimeSlotAtUTC(2021, 1, 1);
     static final ProjectId PROJECT_1 = ProjectId.newOne();
